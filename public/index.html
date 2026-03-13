@@ -2,7 +2,8 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>YouTube Mini Player</title>
+
+<title>Mini Player</title>
 
 <style>
 
@@ -11,13 +12,6 @@ background:#0f172a;
 color:white;
 font-family:sans-serif;
 text-align:center;
-margin:0;
-}
-
-header{
-background:#020617;
-padding:20px;
-font-size:22px;
 }
 
 input{
@@ -37,14 +31,10 @@ background:#2563eb;
 color:white;
 }
 
-button:hover{
-background:#1d4ed8;
-}
-
 #player{
-margin-top:25px;
-display:inline-block;
+margin-top:30px;
 position:relative;
+display:inline-block;
 }
 
 iframe{
@@ -68,95 +58,26 @@ width:100%;
 height:100%;
 }
 
-.playlist{
-margin-top:30px;
-width:600px;
-margin-left:auto;
-margin-right:auto;
-}
-
-.video-item{
-background:#1e293b;
-padding:12px;
-margin:6px;
-border-radius:10px;
-cursor:pointer;
-text-align:left;
-}
-
-.video-item:hover{
-background:#334155;
-}
-
-.menu{
-display:none;
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-background:#020617;
-padding:20px;
-border-radius:15px;
-width:400px;
-box-shadow:0 0 20px rgba(0,0,0,0.5);
-z-index:1000;
-}
-
-.menu-item{
-background:#1e293b;
-padding:10px;
-margin:5px;
-border-radius:10px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-.delete-btn{
-background:#ef4444;
-border:none;
-padding:5px 10px;
-border-radius:6px;
-cursor:pointer;
-}
-
 </style>
+
 </head>
 
 <body>
 
-<header>🎬 YouTube Mini Player</header>
-
-<br>
+<h2>YouTube Mini Player</h2>
 
 <input id="url" placeholder="วางลิงก์ YouTube">
 
 <br><br>
 
-<button onclick="play()">เล่นวิดีโอ</button>
+<button onclick="play()">เล่น</button>
 <button onclick="mini()">Mini Player</button>
-<button onclick="addPlaylist()">เพิ่ม Playlist</button>
-<button onclick="openPlaylistMenu()">เมนู Playlist</button>
+<button onclick="pip()">ลอยนอกจอ</button>
 
 <div id="player"></div>
 
-<div class="playlist" id="playlist"></div>
-
-<div id="playlistMenu" class="menu">
-
-<h2>จัดการ Playlist</h2>
-
-<div id="playlistList"></div>
-
-<br>
-
-<button onclick="closePlaylistMenu()">ปิด</button>
-
-</div>
-
 <script>
 
-let playlistData=[]
 let drag=false
 let offsetX=0
 let offsetY=0
@@ -174,6 +95,7 @@ return url.split("youtu.be/")[1]
 }
 
 return url
+
 }
 
 function play(){
@@ -182,7 +104,7 @@ let url=document.getElementById("url").value
 let id=getID(url)
 
 player.innerHTML=
-`<iframe src="https://www.youtube.com/embed/${id}?autoplay=1" allowfullscreen></iframe>`
+`<iframe id="video" src="https://www.youtube.com/embed/${id}?autoplay=1" allowfullscreen></iframe>`
 
 }
 
@@ -190,87 +112,24 @@ function mini(){
 player.classList.toggle("mini")
 }
 
-function addPlaylist(){
+function pip(){
 
-let url=document.getElementById("url").value
-let id=getID(url)
+let iframe=document.getElementById("video")
 
-playlistData.push({url:url,id:id})
-
-renderPlaylist()
-
+if(iframe){
+iframe.requestPictureInPicture?.()
 }
 
-function renderPlaylist(){
-
-let container=document.getElementById("playlist")
-container.innerHTML=""
-
-playlistData.forEach(v=>{
-
-let div=document.createElement("div")
-div.className="video-item"
-div.innerText=v.url
-
-div.onclick=function(){
-
-player.innerHTML=
-`<iframe src="https://www.youtube.com/embed/${v.id}?autoplay=1" allowfullscreen></iframe>`
-
-}
-
-container.appendChild(div)
-
-})
-
-}
-
-function openPlaylistMenu(){
-
-document.getElementById("playlistMenu").style.display="block"
-
-let list=document.getElementById("playlistList")
-list.innerHTML=""
-
-playlistData.forEach((v,i)=>{
-
-let item=document.createElement("div")
-item.className="menu-item"
-
-let text=document.createElement("span")
-text.innerText=v.url
-
-let del=document.createElement("button")
-del.innerText="ลบ"
-del.className="delete-btn"
-
-del.onclick=function(){
-
-playlistData.splice(i,1)
-renderPlaylist()
-openPlaylistMenu()
-
-}
-
-item.appendChild(text)
-item.appendChild(del)
-
-list.appendChild(item)
-
-})
-
-}
-
-function closePlaylistMenu(){
-document.getElementById("playlistMenu").style.display="none"
 }
 
 document.addEventListener("mousedown",function(e){
 
 if(player.classList.contains("mini")){
+
 drag=true
 offsetX=e.clientX-player.offsetLeft
 offsetY=e.clientY-player.offsetTop
+
 }
 
 })
@@ -278,8 +137,10 @@ offsetY=e.clientY-player.offsetTop
 document.addEventListener("mousemove",function(e){
 
 if(drag){
+
 player.style.left=e.clientX-offsetX+"px"
 player.style.top=e.clientY-offsetY+"px"
+
 }
 
 })
