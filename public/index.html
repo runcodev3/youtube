@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>YouTube Mini Player</title>
+
+<style>
+
+body{
+background:#0f172a;
+color:white;
+font-family:sans-serif;
+text-align:center;
+margin:0;
+padding:0;
+}
+
+header{
+background:#020617;
+padding:20px;
+font-size:22px;
+}
+
+.container{
+margin-top:30px;
+}
+
+input{
+width:400px;
+padding:10px;
+border-radius:10px;
+border:none;
+outline:none;
+}
+
+button{
+padding:10px 20px;
+border:none;
+border-radius:10px;
+margin:5px;
+cursor:pointer;
+background:#2563eb;
+color:white;
+font-size:14px;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+#player{
+margin-top:25px;
+display:inline-block;
+position:relative;
+}
+
+iframe{
+width:800px;
+height:450px;
+border-radius:15px;
+}
+
+.mini{
+position:fixed;
+width:320px;
+height:180px;
+bottom:30px;
+right:30px;
+cursor:move;
+z-index:999;
+}
+
+.mini iframe{
+width:100%;
+height:100%;
+}
+
+.playlist{
+margin-top:40px;
+width:600px;
+margin-left:auto;
+margin-right:auto;
+}
+
+.video-item{
+background:#1e293b;
+padding:12px;
+margin:6px;
+border-radius:10px;
+cursor:pointer;
+text-align:left;
+}
+
+.video-item:hover{
+background:#334155;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+🎬 YouTube Mini Player
+</header>
+
+<div class="container">
+
+<input id="url" placeholder="วางลิงก์ YouTube">
+
+<br><br>
+
+<button onclick="play()">เล่นวิดีโอ</button>
+<button onclick="mini()">Mini Player</button>
+<button onclick="addPlaylist()">เพิ่ม Playlist</button>
+
+</div>
+
+<div id="player"></div>
+
+<div class="playlist" id="playlist"></div>
+
+<script>
+
+let drag=false
+let offsetX=0
+let offsetY=0
+
+const player=document.getElementById("player")
+
+function getID(url){
+
+if(url.includes("watch?v=")){
+return url.split("v=")[1].split("&")[0]
+}
+
+if(url.includes("youtu.be/")){
+return url.split("youtu.be/")[1]
+}
+
+return url
+}
+
+function play(){
+
+let url=document.getElementById("url").value
+let id=getID(url)
+
+player.innerHTML=
+`<iframe src="https://www.youtube.com/embed/${id}?autoplay=1" allowfullscreen></iframe>`
+
+}
+
+function mini(){
+player.classList.toggle("mini")
+}
+
+function addPlaylist(){
+
+let url=document.getElementById("url").value
+let id=getID(url)
+
+let div=document.createElement("div")
+div.className="video-item"
+div.innerText=url
+
+div.onclick=function(){
+
+player.innerHTML=
+`<iframe src="https://www.youtube.com/embed/${id}?autoplay=1" allowfullscreen></iframe>`
+
+}
+
+document.getElementById("playlist").appendChild(div)
+
+}
+
+document.addEventListener("mousedown",function(e){
+
+if(player.classList.contains("mini")){
+
+drag=true
+offsetX=e.clientX-player.offsetLeft
+offsetY=e.clientY-player.offsetTop
+
+}
+
+})
+
+document.addEventListener("mousemove",function(e){
+
+if(drag){
+
+player.style.left=e.clientX-offsetX+"px"
+player.style.top=e.clientY-offsetY+"px"
+
+}
+
+})
+
+document.addEventListener("mouseup",function(){
+
+drag=false
+
+})
+
+</script>
+
+</body>
+</html>
